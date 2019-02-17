@@ -12,20 +12,23 @@
 - 创建用户认证
 
 #### 0.1.1:
-- 加入单元测试
+
 
 #### 0.2.0：
-- 测试Bangumi API的OAuth认证
+
 
 
 ## 需要修改的地方
 - 更安全的登陆方式
 - AppSettings.json的JWT相关
+- 去掉ArticleViewModels
+- 加入单元测试
+- 测试Bangumi API的OAuth认证
 
 ## 笔记
 听：调用Youtube的听歌器，类似discord的
 
-说：个人留言板
+说：个人留言板，提问箱?
 
 读：阅读笔记（动画、电影、书等）
 
