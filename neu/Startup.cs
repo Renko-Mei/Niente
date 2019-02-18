@@ -54,14 +54,17 @@ namespace neu
                 logger.LogInformation("Start neu application in production environment");
             }
 
+            // Register database
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
+            // Register superadministrator
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders()
                 .AddErrorDescriber<CustomIdentityErrorDescriber>();
 
+            // Add CORS policy
             services.AddCors(options =>
             {
                 options.AddPolicy("SiteCorsPolicy",
@@ -93,6 +96,7 @@ namespace neu
                 options.User.RequireUniqueEmail = true;
             });
 
+            // Add Jwt token handler middleware for superadmin authentication
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear(); // => remove default claims
             services
                 .AddAuthentication(options =>
