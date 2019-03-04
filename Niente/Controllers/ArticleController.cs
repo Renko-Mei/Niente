@@ -17,15 +17,15 @@ namespace Niente.Controllers
 {
     [Produces("application/json")]
     [Route("api/Articles")]
-    public class ArticleApiController : Controller
+    public class ArticleController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly IHttpContextAccessor _accessor;
         private readonly ILogger _logger;
 
-        public ArticleApiController(ApplicationDbContext context,
+        public ArticleController(ApplicationDbContext context,
                                      IHttpContextAccessor accessor,
-                                     ILogger<ArticleApiController> logger)
+                                     ILogger<ArticleController> logger)
         {
             _context = context;
             _accessor = accessor;
@@ -73,10 +73,29 @@ namespace Niente.Controllers
             return Ok(article);
         }
 
+        // GET api/articlepreviews
+        [HttpGet]
+        [Route("~/api/articlepreviews")]
+        public async Task<IActionResult> GetPreview([FromQuery]int limit = 5)
+        {
+            _logger.LogInformation($"Getting {limit} article previews...");
+            _logger.LogInformation($"From IP: {_accessor.HttpContext.Connection.RemoteIpAddress.ToString()}");
+
+            var previews = await _context.Articles
+                .Where(a => a.DisplayLevel == DisplayLevel.Default && a.Status == Status.Visible)
+                .OrderBy(a => a.Id)
+                .Take(limit)
+                .Select(a => ToPreview(a))
+                .ToArrayAsync();
+
+            return Ok(previews);
+        }
+
+
         // PUT: api/Articles/5
         [HttpPut("{id}")]
-        [Authorize]
-        public async Task<IActionResult> PutArticle([FromRoute] int id, [FromBody] EditArticleViewModel article)
+        //[Authorize]
+        public async Task<IActionResult> PutArticle([FromRoute] int id, [FromBody] ArticleEditViewModel article)
         {
             string log = $"PUT request: article, id={id}" + Environment.NewLine +
                          $"From IP: {_accessor.HttpContext.Connection.RemoteIpAddress.ToString()}" + Environment.NewLine;
@@ -134,8 +153,8 @@ namespace Niente.Controllers
 
         // POST: api/Articles
         [HttpPost]
-        [Authorize]
-        public async Task<IActionResult> PostArticle([FromBody] PostArticleViewModel article)
+        //[Authorize]
+        public async Task<IActionResult> PostArticle([FromBody] ArticlePostViewModel article)
         {
             string log = $"POST request: article" + Environment.NewLine +
                          $"From IP: {_accessor.HttpContext.Connection.RemoteIpAddress.ToString()}" + Environment.NewLine +
@@ -169,7 +188,7 @@ namespace Niente.Controllers
 
         // DELETE: api/Articles/5
         [HttpDelete("{id}")]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> DeleteArticle([FromRoute] int id)
         {
             string log = $"DELETE request: article id={id}" + Environment.NewLine +
@@ -205,6 +224,19 @@ namespace Niente.Controllers
         private bool ArticleExists(int id)
         {
             return _context.Articles.Any(e => e.Id == id);
+        }
+
+        private ArticlePreviewViewModel ToPreview(Article article)
+        {
+            return new ArticlePreviewViewModel
+            {
+                Title = article.Title,
+                Id = article.Id,
+                CreateAt = article.CreateAt,
+                LastEditAt = article.LastEditAt,
+                PreviewImageUri = article.PreviewImageUri,
+                PreviewText = article.PreviewText
+            };
         }
         #endregion
     }

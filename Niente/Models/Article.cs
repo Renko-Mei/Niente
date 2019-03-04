@@ -31,5 +31,11 @@ namespace Niente.Models
         public string PreviewImageUri { get; set; }
 
         public Uri[] ImageUris { get; set; }
+
+        public DisplayLevel DisplayLevel { get; set; }
+
+        public Language Language { get; set; }
+
+        public Status Status { get; set; }
     }
 }

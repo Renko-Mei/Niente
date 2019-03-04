@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 
 namespace Niente.Models.ArticleViewModels
 {
-    public class EditArticleViewModel
+    public class ArticlePostViewModel
     {
         [MaxLength(50)]
+        [Required]
         public string Title { get; set; }
 
+        [Required]
         public string Content { get; set; }
 
         [MaxLength(100)]

@@ -11,4 +11,23 @@ namespace Niente.Models
         string Body { get; set; }
         DateTime CreateAt { get; set; }
     }
+
+    public enum DisplayLevel
+    {
+        Default,
+        Admin_Only
+    }
+
+    public enum Language
+    {
+        Chinese,
+        English,
+        Universal
+    }
+
+    public enum Status
+    {
+        Visible,
+        Hidden
+    }
 }

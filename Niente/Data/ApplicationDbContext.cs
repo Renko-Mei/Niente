@@ -28,6 +28,9 @@ namespace Niente.Data
             builder.Entity<Article>().Property(a => a.CreateAt).ValueGeneratedOnAdd().HasDefaultValueSql("NOW()");
             builder.Entity<Article>().Property(a => a.LastEditAt).ValueGeneratedOnAddOrUpdate().HasDefaultValueSql("NOW()"); ;
             builder.Entity<Article>().Property(a => a.ImageUris).HasConversion(strArrayToUriArrayConverter);
+            builder.Entity<Article>().Property(a => a.DisplayLevel).HasConversion(new EnumToStringConverter<DisplayLevel>()).HasDefaultValue(DisplayLevel.Default);
+            builder.Entity<Article>().Property(a => a.Language).HasConversion(new EnumToStringConverter<Language>()).HasDefaultValue(Language.Universal);
+            builder.Entity<Article>().Property(a => a.Status).HasConversion(new EnumToStringConverter<Status>()).HasDefaultValue(Status.Visible);
         }
 
         public DbSet<Article> Articles { get; set; }
