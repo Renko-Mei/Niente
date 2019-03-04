@@ -25,8 +25,8 @@ namespace Niente.Data
                 v => v.Split(";", StringSplitOptions.RemoveEmptyEntries)
                       .Select(val => new Uri(val)).ToArray());
 
-            builder.Entity<Article>().Property(a => a.CreateAt).ValueGeneratedOnAdd().HasDefaultValueSql("GETDATE()");
-            builder.Entity<Article>().Property(a => a.LastEditAt).ValueGeneratedOnAddOrUpdate().HasDefaultValueSql("GETDATE()"); ;
+            builder.Entity<Article>().Property(a => a.CreateAt).ValueGeneratedOnAdd().HasDefaultValueSql("NOW()");
+            builder.Entity<Article>().Property(a => a.LastEditAt).ValueGeneratedOnAddOrUpdate().HasDefaultValueSql("NOW()"); ;
             builder.Entity<Article>().Property(a => a.ImageUris).HasConversion(strArrayToUriArrayConverter);
         }
 

@@ -96,7 +96,7 @@ namespace Niente.Controllers
                 Id = target_article.Id,
                 Title = string.IsNullOrWhiteSpace(article.Title) ? target_article.Title : article.Title,
                 Body = string.IsNullOrWhiteSpace(article.Content) ? target_article.Body : article.Content,
-                Subtitle = string.IsNullOrWhiteSpace(article.Subtitle) ? target_article.Subtitle : article.Subtitle,
+                PreviewText = string.IsNullOrWhiteSpace(article.Subtitle) ? target_article.PreviewText : article.Subtitle,
                 CreateAt = target_article.CreateAt,
                 LastEditAt = DateTime.Now
             };
@@ -153,7 +153,7 @@ namespace Niente.Controllers
             {
                 Title = article.Title,
                 Body = article.Content,
-                Subtitle = article.Subtitle,
+                PreviewText = article.Subtitle,
                 CreateAt = DateTime.Now,
                 LastEditAt = DateTime.Now
             };

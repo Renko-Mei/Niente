@@ -20,7 +20,7 @@ namespace Niente.Models
         public string Body { get; set; }
 
         [MaxLength(100)]
-        public string Subtitle { get; set; }
+        public string PreviewText { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime CreateAt { get; set; }
