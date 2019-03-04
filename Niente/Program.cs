@@ -27,10 +27,6 @@ namespace Niente
                 {
                     SeedAdministrator.Seed(services).Wait();
                     SeedArticles.Seed(services);
-                    //RemoteSeedArticlesDatabase.Seed(
-                    //    services.GetRequiredService<IConfiguration>(),
-                    //    logger
-                    //).Wait();
 
                     var context = services.GetRequiredService<ApplicationDbContext>();
                 }

@@ -56,7 +56,7 @@ namespace Niente
 
             // Register database
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+                options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
 
             // Register superadministrator
             services.AddIdentity<ApplicationUser, IdentityRole>()

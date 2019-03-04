@@ -1,6 +1,6 @@
 ﻿using System;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Niente.Migrations
 {
@@ -13,12 +13,12 @@ namespace Niente.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
                     Title = table.Column<string>(maxLength: 50, nullable: false),
                     Body = table.Column<string>(nullable: false),
-                    Subtitle = table.Column<string>(maxLength: 100, nullable: true),
-                    CreateAt = table.Column<DateTime>(nullable: false, defaultValueSql: "CONVERT(date, GETDATE())"),
-                    LastEditAt = table.Column<DateTime>(nullable: false, defaultValueSql: "CONVERT(date, GETDATE())"),
+                    PreviewText = table.Column<string>(maxLength: 100, nullable: true),
+                    CreateAt = table.Column<DateTime>(nullable: false, defaultValueSql: "NOW()"),
+                    LastEditAt = table.Column<DateTime>(nullable: false, defaultValueSql: "NOW()"),
                     PreviewImageUri = table.Column<string>(nullable: true),
                     ImageUris = table.Column<string>(nullable: true)
                 },
@@ -71,7 +71,7 @@ namespace Niente.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
                     RoleId = table.Column<string>(nullable: false),
                     ClaimType = table.Column<string>(nullable: true),
                     ClaimValue = table.Column<string>(nullable: true)
@@ -92,7 +92,7 @@ namespace Niente.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
                     UserId = table.Column<string>(nullable: false),
                     ClaimType = table.Column<string>(nullable: true),
                     ClaimValue = table.Column<string>(nullable: true)
@@ -181,8 +181,7 @@ namespace Niente.Migrations
                 name: "RoleNameIndex",
                 table: "AspNetRoles",
                 column: "NormalizedName",
-                unique: true,
-                filter: "[NormalizedName] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUserClaims_UserId",
@@ -208,8 +207,7 @@ namespace Niente.Migrations
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
-                unique: true,
-                filter: "[NormalizedUserName] IS NOT NULL");
+                unique: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
