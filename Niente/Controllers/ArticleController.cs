@@ -88,6 +88,8 @@ namespace Niente.Controllers
                 .Select(a => ToPreview(a))
                 .ToArrayAsync();
 
+            _logger.LogInformation($"Sent {previews.Count()} article previews to the client");
+
             return Ok(previews);
         }
 
@@ -183,7 +185,7 @@ namespace Niente.Controllers
             log += "Result: article has been saved in the database";
             _logger.LogInformation(log);
 
-            return CreatedAtAction("GetArticle", new { id = entry.Id }, entry);
+            return CreatedAtAction("PostArticle", new { id = entry.Id }, entry);
         }
 
         // DELETE: api/Articles/5
