@@ -157,7 +157,7 @@ namespace Niente
 
             app.UseCors("SiteCorsPolicy");
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseMvc();
 
