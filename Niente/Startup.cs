@@ -21,6 +21,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Niente.Common;
 using Niente.Data;
+using Niente.Middlewares;
 using Niente.Models;
 
 namespace Niente
@@ -55,16 +56,6 @@ namespace Niente
                 logger.LogInformation("Start Niente application in production environment");
             }
 
-            // Register database
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
-
-            // Register superadministrator
-            services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddDefaultTokenProviders()
-                .AddErrorDescriber<CustomIdentityErrorDescriber>();
-
             // Add CORS policy
             services.AddCors(options =>
             {
@@ -77,49 +68,13 @@ namespace Niente
                     .Build());
             });
 
-            // Configure identity constraints
-            services.Configure<IdentityOptions>(options =>
-            {
-                // Password settings
-                options.Password.RequireDigit = true;
-                options.Password.RequiredLength = 8;
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireUppercase = true;
-                options.Password.RequireLowercase = false;
-                options.Password.RequiredUniqueChars = 2;
+            // Register database
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
 
-                // Lockout settings
-                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromHours(1);
-                options.Lockout.MaxFailedAccessAttempts = 10;
-                options.Lockout.AllowedForNewUsers = true;
+            Identity.Configure(services);
 
-                // User settings
-                options.User.RequireUniqueEmail = true;
-            });
-
-            // Add Jwt token handler middleware for superadmin authentication
-            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear(); // => remove default claims
-            services
-                .AddAuthentication(options =>
-                {
-                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-
-                })
-                .AddJwtBearer(cfg =>
-                {
-                    cfg.RequireHttpsMetadata = false;
-                    cfg.SaveToken = true;
-                    var issueer = Configuration["JWT:JwtIssuer"];
-                    cfg.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidIssuer = Configuration["JWT:JwtIssuer"],
-                        ValidAudience = Configuration["JWT:JwtIssuer"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JWT:JwtKey"])),
-                        ClockSkew = TimeSpan.Zero // remove delay of token when expire
-                    };
-                });
+            JwtAuthentication.Configure(services, Configuration);
 
             // Register custom username / password combination validator
             services.AddTransient<IPasswordValidator<ApplicationUser>, PwConstraintValidator>();
@@ -157,7 +112,10 @@ namespace Niente
 
             app.UseCors("SiteCorsPolicy");
 
-            //app.UseHttpsRedirection();
+            if (env.IsDevelopment())
+            {
+                app.UseHttpsRedirection();
+            }
 
             app.UseMvc();
 
