@@ -15,8 +15,6 @@ namespace Niente.Models.ArticleViewModels
 
         public DateTime CreateAt { get; set; }
 
-        public DateTime LastEditAt { get; set; }
-
         public string PreviewImageUri { get; set; }
     }
 }

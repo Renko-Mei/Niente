@@ -237,7 +237,6 @@ namespace Niente.Controllers
                 Title = article.Title,
                 Id = article.Id,
                 CreateAt = article.CreateAt,
-                LastEditAt = article.LastEditAt,
                 PreviewImageUri = article.PreviewImageUri,
                 PreviewText = article.PreviewText
             };
