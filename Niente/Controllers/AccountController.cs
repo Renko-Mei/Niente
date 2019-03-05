@@ -18,7 +18,6 @@ using Niente.Models;
 namespace Niente.Controllers
 {
     [ApiController]
-    [Route("[action]")]
     public class AccountController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -41,21 +40,25 @@ namespace Niente.Controllers
         [TempData]
         public string ErrorMessage { get; set; }
 
+        // POST api/login
         [HttpPost]
         //[ValidateAntiForgeryToken]
+        [Route("~/api/login")]
         public async Task<IActionResult> Login(string username, string password, bool rememberMe = true)
         {
             if (ModelState.IsValid)
             {
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(username, password, rememberMe, lockoutOnFailure: false);
+                var result = await _signInManager.PasswordSignInAsync(
+                    username, password, rememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
 
                     var appUser = _userManager.Users.SingleOrDefault(r => r.UserName == username);
-                    return Ok(GenerateJwtToken(appUser.Email, appUser));
+                    var token = GenerateJwtToken(appUser.Email, appUser);
+                    return Ok(token);
                 }
                 else
                 {
@@ -65,10 +68,12 @@ namespace Niente.Controllers
             }
 
             // If we got this far, something failed, redisplay form
-            return Ok("There is something wrong with the server");
+            return StatusCode(500, ("There is something wrong with the server"));
         }
 
+        // POST api/logout
         [HttpPost]
+        [Route("~/api/logout")]
         //[ValidateAntiForgeryToken]
         public async void Logout()
         {

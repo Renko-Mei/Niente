@@ -3,11 +3,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Niente.Middlewares
 {
@@ -29,12 +26,19 @@ namespace Niente.Middlewares
                 {
                     cfg.RequireHttpsMetadata = false;
                     cfg.SaveToken = true;
-                    var issueer = configuration["JWT:JwtIssuer"];
                     cfg.TokenValidationParameters = new TokenValidationParameters
                     {
+                        ValidateIssuer = true,
                         ValidIssuer = configuration["JWT:JwtIssuer"],
+
+                        ValidateAudience = true,
                         ValidAudience = configuration["JWT:JwtIssuer"],
+
+                        ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:JwtKey"])),
+
+                        RequireExpirationTime = false,
+                        ValidateLifetime = true,
                         ClockSkew = TimeSpan.Zero // remove delay of token when expire
                     };
                 });
