@@ -13,9 +13,11 @@ namespace Niente.Models.ArticleViewModels
         public string Title { get; set; }
 
         [Required]
-        public string Content { get; set; }
+        public string Body { get; set; }
 
         [MaxLength(100)]
-        public string Subtitle { get; set; }
+        public string PreviewText { get; set; }
+
+        public string PreviewImageUri { get; set; }
     }
 }

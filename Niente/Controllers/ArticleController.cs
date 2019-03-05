@@ -116,8 +116,9 @@ namespace Niente.Controllers
             {
                 Id = target_article.Id,
                 Title = string.IsNullOrWhiteSpace(article.Title) ? target_article.Title : article.Title,
-                Body = string.IsNullOrWhiteSpace(article.Content) ? target_article.Body : article.Content,
-                PreviewText = string.IsNullOrWhiteSpace(article.Subtitle) ? target_article.PreviewText : article.Subtitle,
+                Body = string.IsNullOrWhiteSpace(article.Body) ? target_article.Body : article.Body,
+                PreviewText = string.IsNullOrWhiteSpace(article.PreviewText) ? target_article.PreviewText : article.PreviewText,
+                PreviewImageUri = string.IsNullOrWhiteSpace(article.PreviewImageUri) ? target_article.PreviewImageUri : article.PreviewImageUri,
                 CreateAt = target_article.CreateAt,
                 LastEditAt = DateTime.Now
             };
@@ -173,8 +174,9 @@ namespace Niente.Controllers
             var entry = new Article
             {
                 Title = article.Title,
-                Body = article.Content,
-                PreviewText = article.Subtitle,
+                Body = article.Body,
+                PreviewText = article.PreviewText,
+                PreviewImageUri = article.PreviewImageUri,
                 CreateAt = DateTime.Now,
                 LastEditAt = DateTime.Now
             };
