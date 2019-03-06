@@ -44,19 +44,24 @@ namespace Niente.Controllers
         [HttpPost]
         //[ValidateAntiForgeryToken]
         [Route("~/api/login")]
-        public async Task<IActionResult> Login(string username, string password, bool rememberMe = true)
+        public async Task<IActionResult> Login([FromBody] LoginViewModel model)
         {
+            _logger.LogInformation(model.Username + model.Password + model.RememberMe);
             if (ModelState.IsValid)
             {
+                if (string.IsNullOrWhiteSpace(model.Username) || string.IsNullOrWhiteSpace(model.Password))
+                {
+                    return BadRequest(new { message = "Invalid username and password" });
+                }
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
                 var result = await _signInManager.PasswordSignInAsync(
-                    username, password, rememberMe, lockoutOnFailure: false);
+                    model.Username, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
 
-                    var appUser = _userManager.Users.SingleOrDefault(r => r.UserName == username);
+                    var appUser = _userManager.Users.SingleOrDefault(r => r.UserName == model.Username);
                     var token = GenerateJwtToken(appUser.Email, appUser);
                     return Ok(token);
                 }
@@ -115,6 +120,15 @@ namespace Niente.Controllers
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+        #endregion
+
+        #region ViewModel
+        public class LoginViewModel
+        {
+            public string Username { get; set; }
+            public string Password { get; set; }
+            public bool RememberMe { get; set; } = true;
+        }
         #endregion
     }
 }
