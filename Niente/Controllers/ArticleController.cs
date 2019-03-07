@@ -47,6 +47,7 @@ namespace Niente.Controllers
 
         // GET: api/Articles/5
         [HttpGet("{id}")]
+        // TODO: implement by resource authorization
         public async Task<IActionResult> GetArticle([FromRoute] int id)
         {
             string log = $"GET request: article, id={id}" + Environment.NewLine +
@@ -127,12 +128,16 @@ namespace Niente.Controllers
             var entry = new Article
             {
                 Id = target_article.Id,
-                Title = string.IsNullOrWhiteSpace(article.Title) ? target_article.Title : article.Title,
-                Body = string.IsNullOrWhiteSpace(article.Body) ? target_article.Body : article.Body,
-                PreviewText = string.IsNullOrWhiteSpace(article.PreviewText) ? target_article.PreviewText : article.PreviewText,
-                PreviewImageUri = string.IsNullOrWhiteSpace(article.PreviewImageUri) ? target_article.PreviewImageUri : article.PreviewImageUri,
+                Title = (string.IsNullOrWhiteSpace(article.Title) ? target_article.Title : article.Title).Trim(),
+                Body = (string.IsNullOrWhiteSpace(article.Body) ? target_article.Body : article.Body).Trim(),
+                PreviewText = (string.IsNullOrWhiteSpace(article.PreviewText) ? target_article.PreviewText : article.PreviewText).Trim(),
+                PreviewImageUri = (string.IsNullOrWhiteSpace(article.PreviewImageUri) ? target_article.PreviewImageUri : article.PreviewImageUri).Trim(),
                 CreateAt = target_article.CreateAt,
-                LastEditAt = DateTime.Now
+                LastEditAt = DateTime.Now,
+                DisplayLevel = target_article.DisplayLevel,
+                ImageUris = target_article.ImageUris,
+                Status = target_article.Status,
+                Language = target_article.Language
             };
 
             _context.DetachLocalInstance<Article>(id);
@@ -163,7 +168,7 @@ namespace Niente.Controllers
             log += "Result: article has been updated";
             _logger.LogInformation(log);
 
-            return NoContent();
+            return Ok(entry);
         }
 
         // POST: api/Articles
@@ -183,14 +188,23 @@ namespace Niente.Controllers
                 return BadRequest(ModelState);
             }
 
+            if (_context.Articles.Any(a => a.Title == article.Title.Trim()))
+            {
+                string msg = "An article with the exact same title already exists";
+                log += $"Warning: " + msg;
+                _logger.LogWarning(log);
+
+                return BadRequest(msg);
+            }
+
             var entry = new Article
             {
-                Title = article.Title,
-                Body = article.Body,
-                PreviewText = article.PreviewText,
-                PreviewImageUri = article.PreviewImageUri,
+                Title = article.Title.Trim(),
+                Body = article.Body.Trim(),
+                PreviewText = article.PreviewText.Trim(),
+                PreviewImageUri = article.PreviewImageUri.Trim(),
                 CreateAt = DateTime.Now,
-                LastEditAt = DateTime.Now
+                LastEditAt = DateTime.Now,
             };
 
             _context.Articles.Add(entry);
@@ -227,10 +241,33 @@ namespace Niente.Controllers
                 return NotFound();
             }
 
-            _context.Articles.Remove(article);
-            await _context.SaveChangesAsync();
+            _context.DetachLocalInstance<Article>(id);
+            article.Status = Status.Hidden;
+            _context.Entry(article).State = EntityState.Modified;
 
-            log += "Result: entry found, article has been deleted from the database";
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ArticleExists(id))
+                {
+                    log += "The article does not exist";
+                    _logger.LogWarning(log);
+
+                    return NotFound();
+                }
+                else
+                {
+                    log += "The database is busy";
+                    _logger.LogWarning(log);
+
+                    throw;
+                }
+            }
+
+            log += "Result: article has been hidden";
             _logger.LogInformation(log);
 
             return Ok(article);
