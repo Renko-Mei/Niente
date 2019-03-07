@@ -34,6 +34,7 @@ namespace Niente.Controllers
 
         // GET: api/Articles
         [HttpGet]
+        [Authorize]
         public IEnumerable<Article> GetArticle()
         {
             _logger.LogInformation($"GET request: all articles");
@@ -70,7 +71,18 @@ namespace Niente.Controllers
 
             log += "Result: entry found, article has been sent to the client";
             _logger.LogInformation(log);
-            return Ok(article);
+            ArticleViewModel model = new ArticleViewModel
+            {
+                Title = article.Title,
+                Body = article.Body,
+                PreviewText = article.PreviewText,
+                PreviewImageUri = article.PreviewImageUri,
+                CreateAt = article.CreateAt,
+                LastEditAt = article.LastEditAt,
+                Id = article.Id,
+                ImageUris = article.ImageUris.Select(u => u.OriginalString).ToArray()
+            };
+            return Ok(model);
         }
 
         // GET api/articlepreviews
@@ -96,7 +108,7 @@ namespace Niente.Controllers
 
         // PUT: api/Articles/5
         [HttpPut("{id}")]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> PutArticle([FromRoute] int id, [FromBody] ArticleEditViewModel article)
         {
             string log = $"PUT request: article, id={id}" + Environment.NewLine +
@@ -156,7 +168,7 @@ namespace Niente.Controllers
 
         // POST: api/Articles
         [HttpPost]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> PostArticle([FromBody] ArticlePostViewModel article)
         {
             string log = $"POST request: article" + Environment.NewLine +
@@ -192,7 +204,7 @@ namespace Niente.Controllers
 
         // DELETE: api/Articles/5
         [HttpDelete("{id}")]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> DeleteArticle([FromRoute] int id)
         {
             string log = $"DELETE request: article id={id}" + Environment.NewLine +
