@@ -81,7 +81,7 @@ namespace Niente.Controllers
                 CreateAt = article.CreateAt,
                 LastEditAt = article.LastEditAt,
                 Id = article.Id,
-                ImageUris = article.ImageUris.Select(u => u.OriginalString).ToArray()
+                ImageUris = article.ImageUris == null ? new string[] { } : article.ImageUris.Select(u => u.OriginalString).ToArray()
             };
             return Ok(model);
         }
@@ -93,6 +93,8 @@ namespace Niente.Controllers
         {
             _logger.LogInformation($"Getting {limit} article previews...");
             _logger.LogInformation($"From IP: {_accessor.HttpContext.Connection.RemoteIpAddress.ToString()}");
+
+            limit = limit < 1 ? await _context.Articles.CountAsync() : limit;
 
             var previews = await _context.Articles
                 .Where(a => a.DisplayLevel == DisplayLevel.Default && a.Status == Status.Visible)
