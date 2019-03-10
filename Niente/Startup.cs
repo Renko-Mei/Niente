@@ -112,10 +112,10 @@ namespace Niente
 
             app.UseCors("SiteCorsPolicy");
 
-            if (env.IsDevelopment())
-            {
-                app.UseHttpsRedirection();
-            }
+            //if (env.IsDevelopment())
+            //{
+            //    app.UseHttpsRedirection();
+            //}
 
             app.UseMvc();
 

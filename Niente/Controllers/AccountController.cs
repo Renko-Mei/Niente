@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Niente.Models;
+using Niente.Models.AuthViewModels;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -73,7 +74,7 @@ namespace Niente.Controllers
             }
 
             // If we got this far, something failed, redisplay form
-            return StatusCode(500, ("There is something wrong with the server"));
+            return StatusCode(500);
         }
 
         // POST api/logout
@@ -96,7 +97,7 @@ namespace Niente.Controllers
             }
         }
 
-        private string GenerateJwtToken(string email, IdentityUser user)
+        private JwtResponseViewModel GenerateJwtToken(string email, IdentityUser user)
         {
             var claims = new List<Claim>
             {
@@ -117,18 +118,15 @@ namespace Niente.Controllers
                 signingCredentials: creds
             );
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            return new JwtResponseViewModel
+            {
+                User = user.UserName,
+                Role = "SuperAdministrator",
+                Token = new JwtSecurityTokenHandler().WriteToken(token),
+                Expires = expires
+            };
         }
 
-        #endregion
-
-        #region ViewModel
-        public class LoginViewModel
-        {
-            public string Username { get; set; }
-            public string Password { get; set; }
-            public bool RememberMe { get; set; } = true;
-        }
         #endregion
     }
 }
